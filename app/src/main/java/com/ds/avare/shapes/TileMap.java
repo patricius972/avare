@@ -62,7 +62,8 @@ public class TileMap {
         mXtiles = tilesdim[0];
         mYtiles = tilesdim[1];
         numTiles = mXtiles * mYtiles;
-        numTilesMax = mXtiles * mYtiles;
+        numTilesMax = 2*mXtiles * mYtiles;
+        Log.i("Tiles","maxbitmapcache "+numTilesMax+ " "+mXtiles+" "+mYtiles);
         mapA = new BitmapHolder[numTiles];
         mapB = new BitmapHolder[numTiles];
         mBitmapCache = new BitmapHolder[numTilesMax];
@@ -106,6 +107,7 @@ public class TileMap {
     public boolean reload(String[] tileNames) throws InterruptedException {
     	HashMap<String,BitmapHolder> hm = new HashMap<String,BitmapHolder> ();
     	int freeIndex = 0;
+        int freeIdxRev = 0;
         mapB = new BitmapHolder[numTiles];
         /* 
          * Initial setup, mark all as candidates for the freelist.
@@ -144,6 +146,7 @@ public class TileMap {
         	}
         }
 
+
         // tiles missing? if any tiles are showing, do not draw chart shapes
         boolean showing = false;
 
@@ -178,7 +181,7 @@ public class TileMap {
             BitmapHolder h = null;
             if (freeIndex > 0 ) {
             	freeIndex--;
-            	h = mFreeList[freeIndex];
+            	h = mFreeList[freeIdxRev++]; //first in first out
             }
             if(h != null) {
                 BitmapHolder b = new BitmapHolder(mContext, mPref, tileNames[tilen], 1);

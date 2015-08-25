@@ -114,14 +114,14 @@ public abstract class Shape {
          */
         float width = paint.getStrokeWidth();
         int color = paint.getColor();
-        
+        int cMax = getNumCoords();
+
         // TrackShape type is used for a flight plan destination
         if (this instanceof TrackShape) {
             
             /*
              * Draw background on track shapes, so draw twice
              */
-        	int cMax = getNumCoords();
             for(int coord = 0; coord < (cMax - 1); coord++) {
                 float x1 = (float)origin.getOffsetX(mCoords.get(coord).getLongitude());
                 float x2 = (float)origin.getOffsetX(mCoords.get(coord + 1).getLongitude());
@@ -162,13 +162,19 @@ public abstract class Shape {
             /*
              * Draw the shape segment by segment
              */
-            for(int coord = 0; coord < (getNumCoords() - 1); coord++) {
+            float pts[]=new float[4*(cMax - 1)];
+            int i=0;
+            for(int coord = 0; coord < (cMax - 1); coord++) {
                 float x1 = (float)origin.getOffsetX(mCoords.get(coord).getLongitude());
                 float x2 = (float)origin.getOffsetX(mCoords.get(coord + 1).getLongitude());
                 float y1 = (float)origin.getOffsetY(mCoords.get(coord).getLatitude());
                 float y2 = (float)origin.getOffsetY(mCoords.get(coord + 1).getLatitude());;
-                c.drawLine(x1, y1, x2, y2, paint);
+                pts[i++]=x1;
+                pts[i++]=y1;
+                pts[i++]=x2;
+                pts[i++]=y2;
             }
+            c.drawLines(pts,paint);
         }
     }
     
