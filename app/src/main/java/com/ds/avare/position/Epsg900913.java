@@ -259,19 +259,17 @@ public class Epsg900913 {
      * Find longitude of offset from this tile projection
      */
     public static double getLongitudeOf(double ofs, double lon, double zoom) {
-        double px = xMetersToPixels(zoom, lonToMeters(lon));
-        px += ofs;
-        double mx = xPixelsToMeters(zoom, px);
-        return metersToLon(mx);
+        double mx = ofs*getResolution(zoom);
+        return lon+metersToLon(mx);
     }
 
     /*
      * Find longitude of offset from this tile projection
      */
     public static double getLatitudeOf(double ofs, double lat, double zoom) {
-        double py = yMetersToPixels(zoom, latToMeters(lat));
-        py -= ofs;
-        double my = yPixelsToMeters(zoom, py);
+        double my = latToMeters(lat);
+        my -= ofs*getResolution(zoom);
+
         return metersToLat(my);
     }
 
@@ -279,18 +277,20 @@ public class Epsg900913 {
      * Find offset X of this given longitude
      */
     public static double getOffsetX(double lon, double lon2, double zoom) {
-        double px0 = xMetersToPixels(zoom, lonToMeters(lon2));
-        double px1 = xMetersToPixels(zoom, lonToMeters(lon));
-        return px0 - px1;
+        double px0 = lonToMeters(lon2);
+        double px1 = lonToMeters(lon);
+
+        return (px0 - px1)/getResolution(zoom);
     }
 
     /*
      * Find offset Y of this given longitude
      */
     public static double getOffsetY(double lat, double lat2, double zoom) {
-        double py0 = yMetersToPixels(zoom, latToMeters(lat2));
-        double py1 = yMetersToPixels(zoom, latToMeters(lat));
-        return py1 - py0;
+        double py0 = latToMeters(lat2);
+        double py1 = latToMeters(lat);
+
+        return (py1 - py0)/getResolution(zoom);
     }
 
 }
