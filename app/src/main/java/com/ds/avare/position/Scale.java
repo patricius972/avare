@@ -122,8 +122,8 @@ public class Scale {
      * 
      * @return
      */
-    public float getScaleCorrected() {
-        return((float)(getScaleFactor() * mScaleCorrectY));
+    public float getScaleCorrected(float Sc) {
+        return((float)(Sc * mScaleCorrectY));
     }
 
     /**

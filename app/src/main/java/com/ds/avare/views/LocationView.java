@@ -697,6 +697,8 @@ public class LocationView extends View implements MultiTouchObjectCanvas<Object>
         if(null != mService) {
             int empty = 0;
             int tn = mService.getTiles().getTilesNum();
+            boolean nightmode = mPref.isNightMode();
+            String charttype = mPref.getChartType();
             
             for(int tilen = 0; tilen < tn; tilen++) {
                 
@@ -723,13 +725,13 @@ public class LocationView extends View implements MultiTouchObjectCanvas<Object>
                     empty++;
                 }
 
-                if(mPref.isNightMode() && (mPref.getChartType().equals("3") || mPref.getChartType().equals("4"))) {
+                if( nightmode && (charttype.equals("3") || charttype.equals("4"))) {
                     /*
                      * IFR charts invert color at night
                      */
                     Helper.invertCanvasColors(mPaint);
                 }
-                else if(mPref.getChartType().equals(Tile.ELEVATION_INDEX)) {
+                else if(charttype.equals(Tile.ELEVATION_INDEX)) {
                     /*
                      * Terrain
                      */
@@ -739,21 +741,23 @@ public class LocationView extends View implements MultiTouchObjectCanvas<Object>
                 /*
                  * Pretty straightforward. Pan and draw individual tiles.
                  */
-                tile.getTransform().setScale(mScale.getScaleFactor(), mScale.getScaleCorrected());
+                float Sc=mScale.getScaleFactor();
+                float Scc=mScale.getScaleCorrected(Sc);
+                tile.getTransform().setScale(Sc,Scc );
                 tile.getTransform().postTranslate(
                         getWidth()  / 2.f
-                        - BitmapHolder.WIDTH  / 2.f * mScale.getScaleFactor() 
-                        + ((tilen % mService.getTiles().getXTilesNum()) * BitmapHolder.WIDTH - BitmapHolder.WIDTH * (int)(mService.getTiles().getXTilesNum() / 2)) * mScale.getScaleFactor()
-                        + mPan.getMoveX() * mScale.getScaleFactor()
-                        + mPan.getTileMoveX() * BitmapHolder.WIDTH * mScale.getScaleFactor()
-                        - (float)mMovement.getOffsetLongitude() * mScale.getScaleFactor(),
+                        +(- BitmapHolder.WIDTH  / 2.f
+                        + ((tilen % mService.getTiles().getXTilesNum()) * BitmapHolder.WIDTH - BitmapHolder.WIDTH * (int)(mService.getTiles().getXTilesNum() / 2))
+                        + mPan.getMoveX()
+                        + mPan.getTileMoveX() * BitmapHolder.WIDTH
+                        - (float)mMovement.getOffsetLongitude() )* Sc,
                         
                         getHeight() / 2.f 
-                        - BitmapHolder.HEIGHT / 2.f * mScale.getScaleCorrected()  
-                        + mPan.getMoveY() * mScale.getScaleCorrected()
-                        + ((tilen / mService.getTiles().getXTilesNum()) * BitmapHolder.HEIGHT - BitmapHolder.HEIGHT * (int)(mService.getTiles().getYTilesNum() / 2)) * mScale.getScaleCorrected() 
-                        + mPan.getTileMoveY() * BitmapHolder.HEIGHT * mScale.getScaleCorrected()
-                        - (float)mMovement.getOffsetLatitude() * mScale.getScaleCorrected());
+                        +(- BitmapHolder.HEIGHT / 2.f
+                        + mPan.getMoveY()
+                        + ((tilen / mService.getTiles().getXTilesNum()) * BitmapHolder.HEIGHT - BitmapHolder.HEIGHT * (int)(mService.getTiles().getYTilesNum() / 2))
+                        + mPan.getTileMoveY() * BitmapHolder.HEIGHT
+                        - (float)mMovement.getOffsetLatitude() )* Scc);
                 
                 Bitmap b = tile.getBitmap();
                 if(null != b) {
@@ -841,6 +845,7 @@ public class LocationView extends View implements MultiTouchObjectCanvas<Object>
             String typeArray[] = mContext.getResources().getStringArray(R.array.AirSig);
             int colorArray[] = mContext.getResources().getIntArray(R.array.AirSigColor);
             String storeType = mPref.getAirSigMetType();
+            boolean nightmode = mPref.isNightMode();
             for(int i = 0; i < mets.size(); i++) {
                 AirSigMet met = mets.get(i);
                 int color = 0;
@@ -870,7 +875,7 @@ public class LocationView extends View implements MultiTouchObjectCanvas<Object>
                  */
                 if(met.shape != null && color != 0) {
                     mPaint.setColor(color);
-                    met.shape.drawShape(canvas, mOrigin, mScale, mMovement, mPaint, mPref.isNightMode(), true);
+                    met.shape.drawShape(canvas, mOrigin, mScale, mMovement, mPaint, nightmode, true);
                 }
             }
         }
